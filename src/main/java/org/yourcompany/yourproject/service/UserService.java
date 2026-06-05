@@ -1,6 +1,5 @@
 package org.yourcompany.yourproject.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yourcompany.yourproject.dto.request.LoginReqDto;
@@ -8,6 +7,8 @@ import org.yourcompany.yourproject.dto.request.NewUserRegisterReqDto;
 import org.yourcompany.yourproject.dto.response.LoginResDto;
 import org.yourcompany.yourproject.entity.User;
 import org.yourcompany.yourproject.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
