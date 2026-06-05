@@ -4,11 +4,15 @@ import java.util.List;
 
 import org.yourcompany.yourproject.entity.Record;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberTodayDashboardResDto {
     // 1. 오늘의 운동 할당량 정보 (의사코드의 todayAssige 및 기획서 [그림4] 반영)
     private Long assignId;               // 운동 과제 고유 코드

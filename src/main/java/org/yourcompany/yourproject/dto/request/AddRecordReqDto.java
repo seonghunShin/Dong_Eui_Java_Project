@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data; // 또는 lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data // ★ 중요: 이게 있어야 getMealType(), getMealTime() 등의 Getter 메서드가 자동으로 생성됩니다!
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,9 +1,11 @@
-package org.yourcompany.yourproject.dto;
+package org.yourcompany.yourproject.dto.request;
 
 import java.time.LocalDate;
 
 import lombok.Data;
 
+
+// 식사 목표 설정 요청 DTO
 public class MealTargetReqDto {
 
     @Data
