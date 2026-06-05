@@ -1,6 +1,9 @@
 package org.yourcompany.yourproject.service;
 
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yourcompany.yourproject.dto.request.AddRecordReqDto;
@@ -15,9 +18,7 @@ import org.yourcompany.yourproject.repository.MealRepository;
 import org.yourcompany.yourproject.repository.RecordRepository;
 import org.yourcompany.yourproject.repository.UserRepository;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
