@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FITLINK 내 목표 캘린더</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="appWrapper">
+  <header id="header">
+    <div id="logo">FITLINK</div>
+    <div id="userInfo">
+      <span><b id="calUserName">회원</b> 님</span>
+      <button id="btnGoMemberMain">메인 대시보드</button>
+    </div>
+  </header>
+
+  <section id="subHeader">
+    <div class="sub-header-left">
+      <button class="btn-back" id="btnBackDashboard">← 대시보드로 돌아가기</button>
+      <h1 class="member-title">내 피드백 & 목표 현황</h1>
+    </div>
+  </section>
+
+  <main id="mainLayout">
+    <article class="dashboard-card" id="leftCol">
+      <nav class="calendar-nav">
+        <span class="nav-arrow" id="btnPrevMonth">&lt;</span>
+        <span id="calendarTitle">2026년 5월</span>
+        <span class="nav-arrow" id="btnNextMonth">&gt;</span>
+      </nav>
+      <div class="calendar-grid" id="calendarGridTarget"></div>
+    </article>
+
+    <aside class="dashboard-card" id="rightCol">
+      <section class="feedback-detail-section">
+        <h3 id="selectedDateTitle" class="feedback-date-title">날짜를 선택하세요</h3>
+        
+        <div class="feedback-card">
+          <h4>오늘의 배정 스케줄 및 달성 현황</h4>
+          
+          <div class="feedback-sub-item">
+            <div class="feedback-label-group">
+              <span class="feedback-tag text-accent">운동 미션</span>
+              <span class="status-badge" id="exTotalBadge">지정 정보 없음</span>
+            </div>
+            <p id="exTextDesc" class="mission-text-content">오른쪽 달력에서 날짜를 클릭하여 확인해 주세요.</p>
+          </div>
+
+          <hr class="card-divider">
+
+          <div class="feedback-sub-item">
+            <div class="feedback-label-group">
+              <span class="feedback-tag text-success">권장 식단 목표</span>
+              <span class="status-badge" id="mealTotalBadge">지정 정보 없음</span>
+            </div>
+            <p id="mealTextDesc" class="mission-text-content">칼로리 및 영양소 기준 정보가 없습니다.</p>
+          </div>
+        </div>
+
+        <div class="feedback-card">
+          <h4>내가 기록한 식사 내역</h4>
+          <div id="mealListContainer" class="scrollable-meal-list"></div>
+        </div>
+      </section>
+    </aside>
+  </main>
+</div>
+
+<script>
+  let users = JSON.parse(localStorage.getItem('users')) || [];
+  let exerciseMissions = JSON.parse(localStorage.getItem('exerciseMissions')) || [];
+  let mealTargets = JSON.parse(localStorage.getItem('mealTargets')) || [];
+  let mealLogs = JSON.parse(localStorage.getItem('mealLogs')) || [];
+
+  let activeMemberId = localStorage.getItem('activeMemberId');
+  if(!activeMemberId && users.length > 0) {
+    activeMemberId = users[0].userId;
+    localStorage.setItem('activeMemberId', activeMemberId);
+  }
+
+  let currentDate = new Date(2026, 4, 1); 
+  let selectedDateStr = "2026-05-15"; 
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const currUserObj = users.find(u => u.userId === activeMemberId);
+    if(currUserObj) {
+      document.getElementById('calUserName').innerText = currUserObj.name;
+    }
+
+    document.getElementById('btnGoMemberMain').addEventListener('click', () => {
+      location.href = 'member.html';
+    });
+    document.getElementById('btnBackDashboard').addEventListener('click', () => {
+      location.href = 'member.html';
+    });
+    document.getElementById('btnPrevMonth').addEventListener('click', () => {
+      changeMonth(-1);
+    });
+    document.getElementById('btnNextMonth').addEventListener('click', () => {
+      changeMonth(1);
+    });
+
+    renderCalendar();
+    loadDateData(selectedDateStr);
+  });
+
+  function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    document.getElementById('calendarTitle').innerText = `${year}년 ${month + 1}월`;
+
+    const grid = document.getElementById('calendarGridTarget');
+    grid.innerHTML = '';
+
+    const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
+    daysOfWeek.forEach(day => {
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'calendar-day-header';
+      headerDiv.innerText = day;
+      grid.appendChild(headerDiv);
+    });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const numDays = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.className = 'calendar-cell empty';
+      grid.appendChild(emptyCell);
+    }
+
+    for (let day = 1; day <= numDays; day++) {
+      const cell = document.createElement('div');
+      cell.className = 'calendar-cell';
+      const dayStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      cell.dataset.date = dayStr;
+
+      const dayNumSpan = document.createElement('span');
+      dayNumSpan.className = 'day-number';
+      dayNumSpan.innerText = day;
+      cell.appendChild(dayNumSpan);
+
+      const dailyEx = exerciseMissions.find(e => e.memberId === activeMemberId && e.targetDate === dayStr);
+      const dailyMeal = mealTargets.find(m => m.memberId === activeMemberId && m.targetDate === dayStr);
+
+      if (dailyEx || dailyMeal) {
+        const dotsContainer = document.createElement('div');
+        dotsContainer.className = 'cell-dots-container';
+
+        if (dailyEx) {
+          const exDot = document.createElement('span');
+          exDot.className = dailyEx.isCompleted ? 'dot dot-ex-success' : 'dot dot-ex-pending';
+          dotsContainer.appendChild(exDot);
+        }
+
+        if (dailyMeal) {
+          const mealDot = document.createElement('span');
+          const dayRecords = mealLogs.filter(r => r.memberId === activeMemberId && r.recordDate === dayStr);
+          const totalKcal = dayRecords.reduce((acc, cur) => acc + cur.kcal, 0);
+
+          if (dayRecords.length === 0) {
+            mealDot.className = 'dot dot-meal-assigned';
+          } else if (totalKcal <= dailyMeal.targetCalories) {
+            mealDot.className = 'dot dot-meal-success';
+          } else {
+            mealDot.className = 'dot dot-meal-fail';
+          }
+          dotsContainer.appendChild(mealDot);
+        }
+        cell.appendChild(dotsContainer);
+      }
+
+      if (dayStr === selectedDateStr) {
+        cell.classList.add('selected');
+      }
+
+      cell.addEventListener('click', () => {
+        document.querySelectorAll('.calendar-cell').forEach(c => c.classList.remove('selected'));
+        cell.classList.add('selected');
+        selectedDateStr = dayStr;
+        loadDateData(dayStr);
+      });
+
+      grid.appendChild(cell);
+    }
+  }
+
+  function changeMonth(direction) {
+    currentDate.setMonth(currentDate.getMonth() + direction);
+    renderCalendar();
+  }
+
+  function loadDateData(dateStr) {
+    const formattedTitle = `${dateStr.split('-')[1]}월 ${dateStr.split('-')[2]}일 목표 & 피드백`;
+    document.getElementById('selectedDateTitle').innerText = formattedTitle;
+
+    const dailyEx = exerciseMissions.find(e => e.memberId === activeMemberId && e.targetDate === dateStr);
+    const exBadge = document.getElementById('exTotalBadge');
+    const exDesc = document.getElementById('exTextDesc');
+
+    if (dailyEx) {
+      exDesc.innerText = `[${dailyEx.missionTitle}] 코칭 가이드 진행 (${dailyEx.targetCalories} kcal 소모 목표)`;
+      if (dailyEx.isCompleted) {
+        exBadge.innerText = "미션 성공";
+        exBadge.className = "status-badge success";
+      } else {
+        exBadge.innerText = "미완료 상태";
+        exBadge.className = "status-badge warning";
+      }
+    } else {
+      exDesc.innerText = "이날 배정된 운동 미션이 없습니다.";
+      exBadge.innerText = "정보 없음";
+      exBadge.className = "status-badge";
+    }
+
+    const dailyMeal = mealTargets.find(m => m.memberId === activeMemberId && m.targetDate === dateStr);
+    const totalBadge = document.getElementById('mealTotalBadge');
+    const mealDesc = document.getElementById('mealTextDesc');
+    const dayRecords = mealLogs.filter(r => r.memberId === activeMemberId && r.recordDate === dateStr);
+    const currentSumKcal = dayRecords.reduce((acc, cur) => acc + cur.kcal, 0);
+
+    if (dailyMeal) {
+      mealDesc.innerText = `권장 가이드: 제한 ${dailyMeal.targetCalories} kcal | 탄 ${dailyMeal.targetCarbs}g | 단 ${dailyMeal.targetProtein}g | 지 ${dailyMeal.targetFat}g\n(현재 누적 섭취: ${currentSumKcal} kcal)`;
+      if (dayRecords.length === 0) {
+        totalBadge.innerText = "기록 대기중";
+        totalBadge.className = "status-badge warning";
+      } else if (currentSumKcal <= dailyMeal.targetCalories) {
+        totalBadge.innerText = "식단 관리 성공";
+        totalBadge.className = "status-badge success";
+      } else {
+        totalBadge.innerText = "식단 초과 실패";
+        totalBadge.className = "status-badge fail";
+      }
+    } else {
+      totalBadge.innerText = "지정 정보 없음"; 
+      totalBadge.className = "status-badge";
+    }
+
+    const mealContainer = document.getElementById('mealListContainer');
+    mealContainer.innerHTML = '';
+
+    if (dayRecords.length > 0) {
+      dayRecords.forEach(meal => {
+        let tagClass = "tag-primary";
+        if(meal.mealType === '점심') tagClass = "tag-success";
+        if(meal.mealType === '저녁') tagClass = "tag-warning";
+        if(meal.mealType === '간식') tagClass = "tag-muted";
+
+        mealContainer.insertAdjacentHTML('beforeend', `
+          <div class="meal-item">
+            <div class="meal-header">
+              <span class="meal-tag ${tagClass}">${meal.mealType}</span>
+              <span class="meal-time-info">${meal.mealTime || ''}</span>
+            </div>
+            <div class="meal-name-row">
+              <span class="food-name-title">${meal.foodName || meal.foodName || '음식'}</span>
+              <span class="kcal-text-highlight">${meal.kcal} kcal</span>
+            </div>
+            <div class="meal-nutrient-grid">
+              탄수화물: ${meal.carbs}g | 단백질: ${meal.protein}g | 지방: ${meal.fat}g
+            </div>
+          </div>
+        `);
+      });
+    } else {
+      mealContainer.innerHTML = '<p class="mission-text-content" style="color:var(--text-muted);">이날 기록한 식단 로그가 없습니다.</p>';
+    }
+  }
+</script>
+</body>
+</html>

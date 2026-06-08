@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FITLINK - 로그인</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1 class="login-title">FITLINK</h1>
+      <p class="login-subtitle">스마트한 회원 관리 및 맞춤 케어 시스템</p>
+    </div>
+
+    <!-- <form id="loginForm" class="login-form">
+      <div class="form-group">
+        <label for="username">아이디</label>
+        <input type="text" id="username" class="form-control" placeholder="아이디를 입력하세요" required>
+      </div>
+      <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" class="form-control" placeholder="비밀번호를 입력하세요" required>
+      </div> -->
+
+      <form action="/user/login" method="post" class="login-form">
+        <div class="form-group">
+          <label for="userId">아이디</label>
+          <input type="text" id="userId" name="userId" class="form-control" placeholder="아이디를 입력하세요" required>
+        </div>
+        <div class="form-group">
+          <label for="password">비밀번호</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호를 입력하세요" required>
+        </div>
+        <button type="submit" class="btn-login-submit">로그인</button>
+        <div th:if="${param.error}" style="color: red; margin-top: 10px; text-align: center;">
+          아이디 또는 비밀번호가 일치하지 않습니다.
+        </div>
+      </form>
+      
+      <button type="submit" class="btn-login-submit">로그인</button>
+    </form>
+
+    <div class="login-footer">
+      <span>테스트 계정 - 트레이너: <b>trainer</b> / 회원: <b>user01</b></span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // [데이터베이스 초기화] 단일 유저 테이블 구조 반영
+  let users = JSON.parse(localStorage.getItem('users'));
+  if (!users) {
+    users = [
+      // 1. 트레이너 계정 데이터
+      { userId: "trainer", password: "1234", name: "김트레이너", role: "TRAINER" },
+      { userId: "trainer02", password: "1234", name: "이코치", role: "TRAINER" },
+      
+      // 2. 일반 회원 계정 데이터 (담당 트레이너 ID 및 잔여 PT 횟수 포함)
+      { userId: "user01", password: "1234", name: "서준영", role: "MEMBER", trainerId: "trainer", ptCount: 8 },
+      { userId: "user02", password: "1234", name: "김지아", role: "MEMBER", trainerId: "trainer", ptCount: 15 },
+      { userId: "user03", password: "1234", name: "박태형", role: "MEMBER", trainerId: "trainer02", ptCount: 0 }
+    ];
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+
+  // 로그인 처리 로직
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    // 1. 단일 유저 테이블에서 아이디로 유저 조회
+    const foundUser = users.find(u => u.userId === username);
+
+    if (foundUser) {
+      // 2. 비밀번호 검증
+      if (foundUser.password === password) {
+        
+        // 3. 권한(role)에 따른 분기 처리
+        if (foundUser.role === "TRAINER") {
+          alert(`${foundUser.name} 강사님, 환영합니다!`);
+          localStorage.setItem('activeTrainerId', foundUser.userId); // 로그인한 트레이너 정보 저장
+          location.href = 'trainer.html';
+        } else if (foundUser.role === "MEMBER") {
+          alert(`${foundUser.name} 회원님, 환영합니다!`);
+          localStorage.setItem('activeMemberId', foundUser.userId); // 로그인한 회원 정보 저장
+          location.href = 'member.html';
+        }
+        return;
+        
+      } else {
+        alert('비밀번호가 일치하지 않습니다.');
+        return;
+      }
+    }
+
+    // 아이디가 존재하지 않는 경우
+    alert('등록되지 않은 아이디입니다.\n(테스트용: trainer 또는 user01 / 비밀번호: 1234)');
+  });
+</script>
+</body>
+</html>
