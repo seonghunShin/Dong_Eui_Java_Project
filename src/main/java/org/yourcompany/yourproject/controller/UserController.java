@@ -18,9 +18,9 @@ public class UserController {
     private final UserService userService;
 
     // 공통 로그인 화면 이동
-    @GetMapping("/login")
+    @GetMapping("/login-page")
     public String loginPage() {
-        return "login"; // templates/login.html
+        return "loginForm"; // templates/login.html
     }
 
     // 의사코드: 클래스 로그인(id, password) 구현부
@@ -41,7 +41,7 @@ public class UserController {
             }
         } catch (IllegalArgumentException e) {
             // 로그인 실패 시 에러 메시지를 들고 로그인 페이지로 리다이렉트
-            return "redirect:/login?error=" + e.getMessage();
+            return "redirect:/login-page?error=" + e.getMessage();
         }
     }
 
@@ -49,13 +49,13 @@ public class UserController {
     @PostMapping("/user/join")
     public String join(@ModelAttribute NewUserRegisterReqDto registerDto) {
         userService.registerMember(registerDto);
-        return "redirect:/login"; 
+        return "redirect:/login-page"; 
     }
 
     // 의사코드: 클래스[로그아웃] 구현부
     @GetMapping("/user/logout")
     public String logout(HttpSession session) {
         session.invalidate(); // 세션 무효화 (로그아웃)
-        return "redirect:/login"; // 로그인 라우팅으로 이동
+        return "redirect:/login-page"; // 로그인 라우팅으로 이동
     }
 }

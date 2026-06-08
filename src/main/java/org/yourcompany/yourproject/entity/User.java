@@ -1,5 +1,8 @@
 package org.yourcompany.yourproject.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,8 +12,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor  // 1. JPA 및 기본 생성자 인식을 위해 필수 추가
 @AllArgsConstructor // 2. 빌더 패턴이 내부적으로 모든 필드 생성자를 쓸 수 있도록 필수 추가
+@Entity
+@Table(name = "users")
 public class User {
 
+    @Id
     private String userId;     
     private String password;   
     private String name;       

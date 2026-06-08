@@ -2,6 +2,10 @@ package org.yourcompany.yourproject.entity;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,9 +15,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Builder
+@Entity
 public class Exercise {
 
+    @Id
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long assignId;            // 운동 과제 고유 식별 번호 (PK, Auto_Increment)
+    @ManyToOne
     private User member;              // 목표를 부여받은 회원 객체 (외래키 매핑)
     private LocalDate targetDate;     // 목표 날짜 (DATE 타입 매핑)
     private String targetExercise;    // 목표 운동 이름

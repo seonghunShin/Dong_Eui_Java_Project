@@ -2,21 +2,21 @@ spring:
   # 1. 데이터베이스 연결 설정 (MariaDB)
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    # localhost:3306 뒤의 'gymconnection'은 생성하신 데이터베이스(스키마) 이름과 일치해야 합니다.
-    url: jdbc:mariadb://localhost:3306/gymconnection?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+    # localhost:3306 뒤의 'javaproject'은 생성하신 데이터베이스(스키마) 이름과 일치해야 합니다.
+    url: jdbc:mariadb://localhost:3306/javaproject
     username: root        # 데이터베이스 접속 계정명 (본인의 환경에 맞게 변경)
-    password: 1234        # 데이터베이스 접속 비밀번호 (본인의 환경에 맞게 변경)
+    password: ''        # 데이터베이스 접속 비밀번호 (본인의 환경에 맞게 변경)
 
   # 2. JPA & Hibernate 설정
   jpa:
-    database: mariadb
-    database-platform: org.hibernate.dialect.MariaDBDialect
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
     
     # 하이버네이트 구동 전략 설정
     # - update: 엔티티 구조와 DB 테이블 구조를 비교하여 변경된 부분만 자동으로 수정/반영합니다.
     # - validate: 엔티티와 테이블이 제대로 매핑되었는지 검증만 수행합니다. (운영 환경 추천)
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
       
     # 콘솔창에 JPA가 내부적으로 생성해서 날리는 SQL 실행 쿼리문을 출력합니다.
     show-sql: true
