@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FITLINK 대시보드</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="appWrapper">
+  <header id="header">
+    <div id="logo">FITLINK</div>
+    <div id="userInfo">
+      <span><b id="mainUserName">서준영</b> 회원님</span>
+      <button id="btnGoCalendar">내 목표 달력 보기</button>
+    </div>
+  </header>
+
+  <main id="mainContent">
+    <div class="top-row-grid">
+      
+      <article class="dashboard-card">
+        <div class="card-header">
+          <h2>오늘의 운동 목표</h2>
+          <span class="status-badge" id="mainExerciseStatus">미완료</span>
+        </div>
+        <section class="exercise-info">
+          <p id="mainExerciseDesc" class="exercise-mission-description">지정 미션이 없습니다.</p>
+          <div class="calorie-large">
+            <span id="mainExerciseKcal">0</span> 
+            <span class="sub-text">kcal 소모 필요</span>
+          </div>
+          <button class="btn-primary full-width-button" id="btnCompleteExercise">미션 완료 처리하기</button>
+        </section>
+      </article>
+
+      <article class="dashboard-card">
+        <div class="card-header">
+          <h2>오늘의 권장 영양 & 섭취 현황</h2>
+          <span class="status-badge" id="mainMealStatus">지정 정보 없음</span>
+        </div>
+        <section class="nutrition-dashboard">
+          <div class="nutrition-dashboard">
+            <div class="nutrient-progress-row">
+              <span>칼로리 섭취량 (<span id="curKcal">0</span> / <span id="targetKcal">0</span> kcal)</span>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill fill-kcal" id="progressKcal"></div>
+              </div>
+            </div>
+            <div class="nutrient-progress-row">
+              <span>탄수화물 (<span id="curCarbs">0</span> / <span id="targetCarbs">0</span> g)</span>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill fill-carbs" id="progressCarbs"></div>
+              </div>
+            </div>
+            <div class="nutrient-progress-row">
+              <span>단백질 (<span id="curProtein">0</span> / <span id="targetProtein">0</span> g)</span>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill fill-protein" id="progressProtein"></div>
+              </div>
+            </div>
+            <div class="nutrient-progress-row">
+              <span>지방 (<span id="curFat">0</span> / <span id="targetFat">0</span> g)</span>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill fill-fat" id="progressFat"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </article>
+
+    </div>
+
+    <article class="dashboard-card">
+      <div class="card-header">
+        <h2>오늘 먹은 식단 등록하기</h2>
+      </div>
+      <section class="meal-registration-form">
+        
+        <div class="form-grid" style="margin-bottom: 16px;">
+          <div class="form-row">
+            <label for="formMealType">식사 종류</label>
+            <select id="formMealType" class="form-control">
+              <option value="아침">아침</option>
+              <option value="점심">점심</option>
+              <option value="저녁">저녁</option>
+              <option value="간식">간식</option>
+            </select>
+          </div>
+          <div class="form-row" style="grid-column: span 2;">
+            <label for="formMealName">음식명</label>
+            <input type="text" id="formMealName" class="form-control" placeholder="예) 닭가슴살 샐러드">
+          </div>
+          <div class="form-row">
+            <label for="formMealTime">섭취 시간</label>
+            <input type="time" id="formMealTime" class="form-control" value="12:00">
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-bottom: 24px;">
+          <label style="margin-bottom: 8px; display: block;">영양성분 상세 기록 (탄·단·지)</label>
+          <div class="nutrient-inputs-grid">
+            <div>
+              <label for="formCarbs">탄수화물 (g)</label>
+              <input type="number" id="formCarbs" class="form-control" value="0">
+            </div>
+            <div>
+              <label for="formProtein">단백질 (g)</label>
+              <input type="number" id="formProtein" class="form-control" value="0">
+            </div>
+            <div>
+              <label for="formFat">지방 (g)</label>
+              <input type="number" id="formFat" class="form-control" value="0">
+            </div>
+            <div>
+              <label for="formKcal">총 칼로리 (kcal)</label>
+              <input type="number" id="formKcal" class="form-control" value="0">
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="btnSubmitMealLog" style="width: 100%; padding: 14px;">식사 추가 완료</button>
+      </section>
+    </article>
+  </main>
+</div>
+
+<script>
+  let users = JSON.parse(localStorage.getItem('users')) || [];
+  let exerciseMissions = JSON.parse(localStorage.getItem('exerciseMissions')) || [];
+  let mealTargets = JSON.parse(localStorage.getItem('mealTargets')) || [];
+  let mealLogs = JSON.parse(localStorage.getItem('mealLogs')) || [];
+  let activeMemberId = localStorage.getItem('activeMemberId');
+
+  if(!activeMemberId && users.length > 0) {
+    activeMemberId = users[0].userId;
+    localStorage.setItem('activeMemberId', activeMemberId);
+  }
+
+  const todayStr = "2026-05-15";
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('btnGoCalendar').addEventListener('click', () => {
+      location.href = 'detail.html';
+    });
+    document.getElementById('btnCompleteExercise').addEventListener('click', completeExercise);
+    document.getElementById('btnSubmitMealLog').addEventListener('click', addMealLog);
+    loadTodayDashboard();
+  });
+
+  function loadTodayDashboard() {
+    const currUser = users.find(u => u.userId === activeMemberId);
+    if(currUser) {
+      document.getElementById('mainUserName').innerText = currUser.name;
+    }
+
+    const todayEx = exerciseMissions.find(e => e.memberId === activeMemberId && e.targetDate === todayStr);
+    const exStatusBadge = document.getElementById('mainExerciseStatus');
+    const exBtn = document.getElementById('btnCompleteExercise');
+
+    if(todayEx) {
+      document.getElementById('mainExerciseDesc').innerText = todayEx.missionTitle;
+      document.getElementById('mainExerciseKcal').innerText = todayEx.targetCalories;
+      if(todayEx.isCompleted) {
+        exStatusBadge.innerText = "완료됨";
+        exStatusBadge.className = "status-badge success";
+        exBtn.disabled = true;
+        exBtn.innerText = "오늘의 미션 완료";
+      } else {
+        exStatusBadge.innerText = "미완료";
+        exStatusBadge.className = "status-badge warning";
+        exBtn.disabled = false;
+        exBtn.innerText = "미션 완료 처리하기";
+      }
+    } else {
+      document.getElementById('mainExerciseDesc').innerText = "배정된 운동 미션이 없습니다.";
+      document.getElementById('mainExerciseKcal').innerText = "0";
+      exStatusBadge.innerText = "배정 없음";
+      exStatusBadge.className = "status-badge";
+      exBtn.disabled = true;
+    }
+
+    const todayMeal = mealTargets.find(m => m.memberId === activeMemberId && m.targetDate === todayStr);
+    const myTodayMeals = mealLogs.filter(r => r.memberId === activeMemberId && r.recordDate === todayStr);
+
+    const sumCarbs = myTodayMeals.reduce((acc, cur) => acc + cur.carbs, 0);
+    const sumProtein = myTodayMeals.reduce((acc, cur) => acc + cur.protein, 0);
+    const sumFat = myTodayMeals.reduce((acc, cur) => acc + cur.fat, 0);
+    const sumKcal = myTodayMeals.reduce((acc, cur) => acc + cur.kcal, 0);
+
+    document.getElementById('curKcal').innerText = sumKcal;
+    document.getElementById('curCarbs').innerText = sumCarbs;
+    document.getElementById('curProtein').innerText = sumProtein;
+    document.getElementById('curFat').innerText = sumFat;
+
+    if(todayMeal) {
+      document.getElementById('targetKcal').innerText = todayMeal.targetCalories;
+      document.getElementById('targetCarbs').innerText = todayMeal.targetCarbs;
+      document.getElementById('targetProtein').innerText = todayMeal.targetProtein;
+      document.getElementById('targetFat').innerText = todayMeal.targetFat;
+
+      const pKcal = Math.min(100, (sumKcal / todayMeal.targetCalories) * 100);
+      const pCarbs = Math.min(100, (sumCarbs / todayMeal.targetCarbs) * 100);
+      const pProtein = Math.min(100, (sumProtein / todayMeal.targetProtein) * 100);
+      const pFat = Math.min(100, (sumFat / todayMeal.targetFat) * 100);
+
+      document.getElementById('progressKcal').style.width = pKcal + '%';
+      document.getElementById('progressCarbs').style.width = pCarbs + '%';
+      document.getElementById('progressProtein').style.width = pProtein + '%';
+      document.getElementById('progressFat').style.width = pFat + '%';
+
+      const mealBadge = document.getElementById('mainMealStatus');
+      if(sumKcal <= todayMeal.targetCalories) {
+        mealBadge.innerText = "식단 관리 성공";
+        mealBadge.className = "status-badge success";
+      } else {
+        mealBadge.innerText = "식단 초과 실패";
+        mealBadge.className = "status-badge fail";
+      }
+    } else {
+      document.getElementById('targetKcal').innerText = "0";
+      document.getElementById('targetCarbs').innerText = "0";
+      document.getElementById('targetProtein').innerText = "0";
+      document.getElementById('targetFat').innerText = "0";
+      document.getElementById('mainMealStatus').innerText = "지정 정보 없음";
+      document.getElementById('mainMealStatus').className = "status-badge";
+    }
+  }
+
+  function completeExercise() {
+    const todayEx = exerciseMissions.find(e => e.memberId === activeMemberId && e.targetDate === todayStr);
+    if(todayEx) {
+      todayEx.isCompleted = true;
+      localStorage.setItem('exerciseMissions', JSON.stringify(exerciseMissions));
+      alert("오늘의 미션 완료가 처리되었습니다! 👏");
+      loadTodayDashboard();
+    } else {
+      alert("오늘 배정된 운동 미션이 없습니다.");
+    }
+  }
+
+  function addMealLog() {
+    const type = document.getElementById('formMealType').value;
+    const name = document.getElementById('formMealName').value.trim();
+    const time = document.getElementById('formMealTime').value;
+    const carbs = parseInt(document.getElementById('formCarbs').value) || 0;
+    const protein = parseInt(document.getElementById('formProtein').value) || 0;
+    const fat = parseInt(document.getElementById('formFat').value) || 0;
+    const kcal = parseInt(document.getElementById('formKcal').value) || 0;
+
+    if(!name) {
+      alert("음식명을 작성해 주세요.");
+      return;
+    }
+
+    mealLogs.push({
+      recordId: mealLogs.length + 1,
+      memberId: activeMemberId,
+      recordDate: todayStr,
+      mealTime: time,
+      mealType: type,
+      foodName: name,
+      carbs: carbs,
+      protein: protein,
+      fat: fat,
+      kcal: kcal
+    });
+
+    localStorage.setItem('mealLogs', JSON.stringify(mealLogs));
+    alert("식사 로그가 정상 기록되었습니다!");
+    
+    document.getElementById('formMealName').value = '';
+    document.getElementById('formCarbs').value = '0';
+    document.getElementById('formProtein').value = '0';
+    document.getElementById('formFat').value = '0';
+    document.getElementById('formKcal').value = '0';
+
+    loadTodayDashboard();
+  }
+</script>
+</body>
+</html>

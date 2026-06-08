@@ -1,4 +1,4 @@
-package org.yourcompany.yourproject.dto;
+package org.yourcompany.yourproject.dto.request;
 
 import java.time.LocalDate;
 
