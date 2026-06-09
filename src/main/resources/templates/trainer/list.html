@@ -19,6 +19,13 @@
   <main id="mainContent">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
       <h2>내 담당 회원 관리</h2>
+      <div style="margin-bottom: 25px; background: white; padding: 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+        <form action="/trainer/member/add" method="post" style="display: flex; gap: 10px; align-items: center;">
+          <h3 style="margin: 0;">회원 추가:</h3>
+          <input type="text" name="userId" class="form-control" placeholder="회원 아이디 입력" required style="margin-bottom: 0; width: 300px;">
+          <button type="submit" class="btn-primary">회원 추가하기</button>
+        </form>
+      </div>
     </div>
 
     <section class="member-list-grid">

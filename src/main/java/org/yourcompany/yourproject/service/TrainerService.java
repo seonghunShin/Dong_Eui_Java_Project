@@ -141,5 +141,21 @@ public class TrainerService {
         member.disconnectTrainer(); // 담당 트레이너 연관 관계 해제 (null 변경)
     }
 
+    @Transactional
+    public void assignMemberToTrainer(String trainerId, String memberId) {
+        User member = userRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+        
+        // 💡 주의: User 엔티티에 setTrainerId 혹은 updateTrainerId 같은 메서드가 있어야 합니다.
+        member.setTrainerId(trainerId); 
+        
+        userRepository.save(member);
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Meal getDailyMealTarget(String memberId, LocalDate date) {
+        return mealRepository.findByMember_UserIdAndTargetDate(memberId, date).orElse(null);
+    }
+
     
 }

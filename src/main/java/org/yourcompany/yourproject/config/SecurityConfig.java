@@ -13,15 +13,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // 💡 성훈님의 컨트롤러가 POST 요청을 받을 수 있도록 CSRF 비활성화
+            .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll() // 💡 시큐리티의 강제 차단 해제 (접근 제어는 성훈님의 컨트롤러가 직접 함!)
+                .anyRequest().permitAll()
+            )
+            // 👇 여기에 아래 내용을 추가하세요!
+            .logout(logout -> logout
+                .logoutUrl("/logout")                 // 대시보드에서 보낼 주소
+                .logoutSuccessUrl("/login-page")      // 로그아웃 성공 후 이동할 주소
+                .invalidateHttpSession(true)          // 세션 무효화
+                .deleteCookies("JSESSIONID")          // 쿠키 삭제
             );
             
-            // 🎯 formLogin(...) 블록을 완전히 삭제했습니다.
-            // 이제 /user/login 요청이 들어오면 시큐리티가 가로채지 않고, 
-            // 성훈님의 UserController로 100% 안전하게 전달됩니다.
-
         return http.build();
     }
 }

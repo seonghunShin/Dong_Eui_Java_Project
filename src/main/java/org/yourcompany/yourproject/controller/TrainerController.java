@@ -8,9 +8,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.yourcompany.yourproject.dto.request.TotalTargetAssignReqDto;
 import org.yourcompany.yourproject.dto.request.UpdatePtCountReqDto;
+import org.yourcompany.yourproject.dto.response.CalendarDetailRecordDto;
 import org.yourcompany.yourproject.dto.response.CalendarBriefInformationDto;
 import org.yourcompany.yourproject.dto.response.LoginResDto;
 import org.yourcompany.yourproject.dto.response.TrainerMemberListResDto;
+import org.yourcompany.yourproject.entity.Meal;
 import org.yourcompany.yourproject.entity.User;
 import org.yourcompany.yourproject.repository.UserRepository;
 import org.yourcompany.yourproject.service.TrainerService;
@@ -48,24 +50,37 @@ public class TrainerController {
                                @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                                Model model) {
         
-        // 1. 회원의 진짜 이름 가져오기 (이름 안 뜨는 문제 해결!)
         User member = userRepository.findById(memberId)
-        .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
         
         if (date == null) date = LocalDate.now();
 
-        // 2. 캘린더 데이터 가져오기
         Map<Integer, CalendarBriefInformationDto> todoDayMap = trainerService.getCalendarSummary(memberId, date);
         
-        // 3. 모델에 담기
         model.addAttribute("pageUserId", memberId);
-        model.addAttribute("pageUserName", member.getName()); // 💡 이름 추가!
+        model.addAttribute("pageUserName", member.getName());
+        model.addAttribute("ptCount", member.getPtCount()); 
         model.addAttribute("todoDay", todoDayMap);
         model.addAttribute("selectedDate", date);
-        model.addAttribute("ptCount", member.getPtCount()); 
-        model.addAttribute("pageUserId", memberId);
+
+        // 🎯 [신규 추가] 식단 기록 및 목표 달성 여부 데이터
+        List<CalendarDetailRecordDto> mealDay = trainerService.getDailyDietDetails(memberId, date);
+        Meal targetMeal = trainerService.getDailyMealTarget(memberId, date);
+
+        // 총 섭취량 자동 계산 (스트림 활용)
+        int totalKcal = mealDay.stream().mapToInt(m -> m.getCalories()).sum();
+        int totalCarbs = mealDay.stream().mapToInt(m -> m.getCarbs()).sum();
+        int totalProtein = mealDay.stream().mapToInt(m -> m.getProtein()).sum();
+        int totalFat = mealDay.stream().mapToInt(m -> m.getFat()).sum();
+
+        model.addAttribute("mealDay", mealDay);
+        model.addAttribute("targetMeal", targetMeal);
+        model.addAttribute("totalKcal", totalKcal);
+        model.addAttribute("totalCarbs", totalCarbs);
+        model.addAttribute("totalProtein", totalProtein);
+        model.addAttribute("totalFat", totalFat);
         
-        return "trainer/detail"; // (보여주신 detail.html 파일 경로에 맞게 수정)
+        return "trainer/detail";
     }
 
     // 의사코드: public void PT 횟수 변경(userId, newPTCount)

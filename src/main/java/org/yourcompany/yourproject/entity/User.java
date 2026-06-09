@@ -35,4 +35,9 @@ public class User {
     public void disconnectTrainer() {
         this.trainerId = null;
     }
+
+    public void setTrainerId(String trainerId) {
+        this.trainerId = trainerId;
+    }
+    
 }
