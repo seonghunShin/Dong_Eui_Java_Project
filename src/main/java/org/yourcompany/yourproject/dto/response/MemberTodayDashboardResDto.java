@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemberTodayDashboardResDto {
+
+    private String name;
     // 1. 오늘의 운동 할당량 정보 (의사코드의 todayAssige 및 기획서 [그림4] 반영)
     private Long assignId;               // 운동 과제 고유 코드
     private String targetExerciseName;   // 목표 운동 이름 (예: "스쿼트 100개, 푸시업 50개") [cite: 142]

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FITLINK - 로그인</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
 
@@ -39,9 +39,6 @@
           아이디 또는 비밀번호가 일치하지 않습니다.
         </div>
       </form>
-      
-      <button type="submit" class="btn-login-submit">로그인</button>
-    </form>
 
     <div class="login-footer">
       <span>테스트 계정 - 트레이너: <b>trainer</b> / 회원: <b>user01</b></span>

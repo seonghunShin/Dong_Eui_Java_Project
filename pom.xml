@@ -16,8 +16,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
-        <spring-boot.run.mainClass>org.yourcompany.yourproject.JavaKiston</spring-boot.run.mainClass>
+        <maven.compiler.release>21</maven.compiler.release>
+        <spring-boot.run.mainClass>org.yourcompany.yourproject.FitlinkApplication</spring-boot.run.mainClass>
     </properties>
 
     <dependencies>

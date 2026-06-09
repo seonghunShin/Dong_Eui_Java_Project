@@ -750,3 +750,83 @@ body {
   font-size: 0.85rem;
   color: var(--text-muted);
 }
+
+/* ===== detail.html 전용 스타일 ===== */
+
+/* 캘린더 + 사이드패널 2단 레이아웃 */
+.calendar-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+.calendar-main-section {
+  flex: 2;
+}
+.calendar-side-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 캘린더 내부 헤더 */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.calendar-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+/* 요일 헤더 (일~토) */
+.calendar-grid-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* 캘린더 셀 내부 인디케이터 */
+.day-indicators {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.indicator-dot {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.goal-dot {
+  background-color: #eff6ff;
+  color: var(--primary);
+}
+.diet-dot {
+  background-color: #ecfdf5;
+  color: var(--success);
+}
+
+/* 반응형 */
+@media (max-width: 900px) {
+  .calendar-layout {
+    flex-direction: column;
+  }
+  .calendar-main-section,
+  .calendar-side-panel {
+    flex: none;
+    width: 100%;
+  }
+}

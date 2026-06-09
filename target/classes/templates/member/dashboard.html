@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FITLINK 대시보드</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
 
@@ -186,9 +186,6 @@
   const todayStr = "2026-05-15";
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('btnGoCalendar').addEventListener('click', () => {
-      location.href = 'detail.html';
-    });
     document.getElementById('btnCompleteExercise').addEventListener('click', completeExercise);
     document.getElementById('btnSubmitMealLog').addEventListener('click', addMealLog);
     loadTodayDashboard();

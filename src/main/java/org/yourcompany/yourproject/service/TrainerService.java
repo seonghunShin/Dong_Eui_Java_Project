@@ -140,4 +140,6 @@ public class TrainerService {
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
         member.disconnectTrainer(); // 담당 트레이너 연관 관계 해제 (null 변경)
     }
+
+    
 }

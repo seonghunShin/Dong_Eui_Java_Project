@@ -34,6 +34,10 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public MemberTodayDashboardResDto getTodayDashboard(String memberId, LocalDate today) {
+
+        User member = userRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+
         // 1. 오늘의 운동 할당량 조회 (의사코드: todayassige 매핑)
         Exercise exercise = exerciseRepository.findByMember_UserIdAndTargetDate(memberId, today).orElse(null);
 
@@ -51,6 +55,7 @@ public class MemberService {
 
         // 5. 대시보드 화면용 단일 반응 DTO로 가공 조립 후 리턴
         return MemberTodayDashboardResDto.builder()
+                .name(member.getName())
                 .assignId(exercise != null ? exercise.getAssignId() : null)
                 .targetExerciseName(exercise != null ? exercise.getTargetExercise() : "할당된 운동이 없습니다.")
                 .targetBurnedCalories(exercise != null ? exercise.getTargetBurnedCal() : 0)
