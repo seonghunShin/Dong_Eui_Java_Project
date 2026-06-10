@@ -7,15 +7,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor; // 필수 추가
-import lombok.Builder;           // 필수 유지
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;  // 필수 추가
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-@NoArgsConstructor  // 필수 추가
-@AllArgsConstructor // 필수 추가
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Record {
 

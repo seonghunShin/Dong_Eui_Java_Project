@@ -29,31 +29,29 @@ public class MemberService {
     private final ExerciseRepository exerciseRepository;
     private final RecordRepository recordRepository;
 
-    /**
-     * 의사코드: 맴버 메인 라우팅 비즈니스 데이터 총합 연산부 구현
-     */
+    // 멤버 대시보드 조회
     @Transactional(readOnly = true)
     public MemberTodayDashboardResDto getTodayDashboard(String memberId, LocalDate today) {
 
         User member = userRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
-        // 1. 오늘의 운동 할당량 조회 (의사코드: todayassige 매핑)
+        // 오늘의 운동 할당량 조회
         Exercise exercise = exerciseRepository.findByMember_UserIdAndTargetDate(memberId, today).orElse(null);
 
-        // 2. 오늘의 권장 식단 가이드라인 조회
+        // 오늘의 권장 식단 가이드라인 조회
         Meal meal = mealRepository.findByMember_UserIdAndTargetDate(memberId, today).orElse(null);
 
-        // 3. 의사코드 whlie(끝까지 조회) 조건절 대체 -> 금일 날짜에 겹치는 식단 테이블 리스트 초고속 쿼리
+        // 금일 날짜에 겹치는 식단 테이블 리스트 초고속 쿼리
         List<Record> todayRecords = recordRepository.findByMember_UserIdAndRecordDate(memberId, today);
 
-        // 4. 의사코드: [총칼로리/탄단지 비교기능] -> 스트림 루프 돌며 오늘 먹은 실제 총합 합산 연산
+        // 총칼로리, 탄단지 계산
         int currentCal = todayRecords.stream().mapToInt(Record::getCalories).sum();
         int currentCarbs = todayRecords.stream().mapToInt(Record::getCarbo).sum();
         int currentProtein = todayRecords.stream().mapToInt(Record::getProtein).sum();
         int currentFat = todayRecords.stream().mapToInt(Record::getFat).sum();
 
-        // 5. 대시보드 화면용 단일 반응 DTO로 가공 조립 후 리턴
+        // 대시보드 화면용 단일 반응 DTO로 가공 조립 후 리턴
         return MemberTodayDashboardResDto.builder()
                 .name(member.getName())
                 .assignId(exercise != null ? exercise.getAssignId() : null)
@@ -68,31 +66,23 @@ public class MemberService {
                 .currentTotalCarbs(currentCarbs)
                 .currentTotalProtein(currentProtein)
                 .currentTotalFat(currentFat)
-                .todayMealRecords(todayRecords) // 하단 타임라인 html 렌더링용 리스트
+                .todayMealRecords(todayRecords)
                 .build();
     }
 
-    /**
-     * 의사코드: 클레스[운동완료체크기능] (운동 테이블 todogool -> not 변경)
-     */
+    // 운동완료 체크 기능
     @Transactional
     public void toggleExerciseStatus(ToggleExerciseGoalReqDto dto) {
         Exercise exercise = exerciseRepository.findById(dto.getAssignId())
                 .orElseThrow(() -> new IllegalArgumentException("과제를 찾을 수 없습니다."));
-        
-        // 의사코드의 -> not 변경 (상태 반전 로직 적용)
         exercise.toggleGoalStatus(); 
     }
 
-    /**
-     * 의사코드: 클래스[식단 기록하기](기록 테이블 전달 -> 튜플 추가)
-     */
+    // 식단 기록
     @Transactional
     public void addDietRecord(String memberId, AddRecordReqDto dto) {
         User member = userRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
-
-        // DTO 상자 열어서 고유 식별 번호 로직(JPA save 자동화) 형태로 테이블 전달
         Record record = Record.builder()
                 .member(member)
                 .mealType(dto.getMealType())
@@ -102,7 +92,7 @@ public class MemberService {
                 .protein(dto.getProtein())
                 .fat(dto.getFat())
                 .calories(dto.getCalories())
-                .recordDate(LocalDate.now()) // 오늘 날짜 자동 스탬프
+                .recordDate(LocalDate.now())
                 .recordDateTime(LocalDateTime.now())
                 .build();
 

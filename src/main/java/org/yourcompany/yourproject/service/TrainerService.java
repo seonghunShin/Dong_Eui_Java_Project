@@ -32,15 +32,12 @@ public class TrainerService {
     private final ExerciseRepository exerciseRepository;
     private final RecordRepository recordRepository;
 
-    /**
-     * 의사코드: 클레스[트레이너 담당 리스트 불러오기] 구현
-     */
+    // 트레이너가 담당하는 회원 목록 조회
     @Transactional(readOnly = true)
     public List<TrainerMemberListResDto> getMemberList(String trainerId) {
-        // DB에서 trainerId가 일치하는 회원 목록을 한 번에 select 해옵니다.
+        // DB에서 trainerId가 일치하는 회원 목록을 한 번에 select
         List<User> members = userRepository.findByTrainerId(trainerId);
 
-        // 엔티티 리스트를 DTO 리스트로 깔끔하게 변환(Stream 활용)
         return members.stream()
                 .map(m -> TrainerMemberListResDto.builder()
                         .memberId(m.getUserId())
@@ -50,14 +47,11 @@ public class TrainerService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 의사코드: Map<Integer, TodoDayDto> 형태의 달력 일별 요약 맵 생성 데이터 로직
-     */
+    // 달력
     @Transactional(readOnly = true)
     public Map<Integer, CalendarBriefInformationDto> getCalendarSummary(String memberId, LocalDate date) {
         Map<Integer, CalendarBriefInformationDto> summaryMap = new HashMap<>();
 
-        // 특정 년/월의 1일부터 31일까지 데이터를 루프 돌며 가공 (여기서는 예시로 간소화 구현)
         int lengthOfMonth = date.lengthOfMonth();
         for (int day = 1; day <= lengthOfMonth; day++) {
             LocalDate targetDate = date.withDayOfMonth(day);
@@ -77,9 +71,7 @@ public class TrainerService {
         return summaryMap;
     }
 
-    /**
-     * 의사코드: String[][] mealDay 대용 List<MealDetailDto> 구현 (일별 식단 상세 타임라인)
-     */
+    // 일별 식단 상세 기록 조회
     @Transactional(readOnly = true)
     public List<CalendarDetailRecordDto> getDailyDietDetails(String memberId, LocalDate date) {
         List<Record> records = recordRepository.findByMember_UserIdAndRecordDate(memberId, date);
@@ -100,9 +92,7 @@ public class TrainerService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 의사코드: public void PT 횟수 변경(userId, newPTCount)
-     */
+    // PT 횟수 설정
     @Transactional
     public void updatePtCount(UpdatePtCountReqDto dto) {
         User member = userRepository.findById(dto.getMemberId())
@@ -110,30 +100,26 @@ public class TrainerService {
         member.updatePtCount(dto.getPtCount()); // 더티 체킹(Dirty Checking)으로 DB 자동 반영
     }
 
-    /**
-     * 의사코드: public void 목표설정(목표설정Dto, pageId)
-     */
+    // 회원 목표 설정
     @Transactional
     public void assignTodayTarget(TotalTargetAssignReqDto dto) {
         User member = userRepository.findById(dto.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
-        // 1. 식단 과제 저장 또는 수정
+        // 식단 과제 저장 또는 수정
         Meal meal = mealRepository.findByMember_UserIdAndTargetDate(dto.getMemberId(), dto.getTargetDate())
                 .orElse(Meal.builder().member(member).targetDate(dto.getTargetDate()).build());
         meal.updateTargets(dto.getTargetCalories(), dto.getTargetCarbs(), dto.getTargetProtein(), dto.getTargetFat());
         mealRepository.save(meal);
 
-        // 2. 운동 과제 저장 또는 수정
+        // 운동 과제 저장 또는 수정
         Exercise exercise = exerciseRepository.findByMember_UserIdAndTargetDate(dto.getMemberId(), dto.getTargetDate())
                 .orElse(Exercise.builder().member(member).targetDate(dto.getTargetDate()).build());
         exercise.updateExerciseTargets(dto.getTargetExerciseName(), dto.getTargetBurnedCalories());
         exerciseRepository.save(exercise);
     }
 
-    /**
-     * 의사코드: public void 회원삭제(pageUserId, trainerId) -> 외래키 해제 유연 로직
-     */
+    // 회원 삭제
     @Transactional
     public void removeMemberFromTrainer(String memberId) {
         User member = userRepository.findById(memberId)
@@ -146,7 +132,6 @@ public class TrainerService {
         User member = userRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
         
-        // 💡 주의: User 엔티티에 setTrainerId 혹은 updateTrainerId 같은 메서드가 있어야 합니다.
         member.setTrainerId(trainerId); 
         
         userRepository.save(member);

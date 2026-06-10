@@ -95,7 +95,6 @@
 
     <build>
         <plugins>
-            <!-- 💡 이 부분을 추가했습니다: 컴파일러가 롬복을 인식하게 만드는 핵심 설정 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

@@ -154,10 +154,10 @@
 </div>
 
 <script th:inline="javascript">
-  // 1. 초기 PT 횟수를 문자가 아닌 숫자로 안전하게 가져오기
-  let currentPt = parseInt(/*[[${ptCount != null ? ptCount : 0}]]*/ 0, 10);
+  // 초기 PT 횟수를 문자가 아닌 숫자로 안전하게 가져오기
+  let currentPt = parseInt(0, 10);
 
-  // 2. PT 횟수 +, - 조절 함수
+  // PT 횟수 +, - 조절 함수
   function adjustPt(delta) {
     currentPt += delta;
     if (currentPt < 0) currentPt = 0; // 마이너스로 내려가지 않게 방지
@@ -165,7 +165,7 @@
     document.getElementById('ptDisplay').innerText = "현재 " + currentPt + "회 남음";
   }
 
-  // 3. 변경된 PT 횟수 서버에 저장
+  // 변경된 PT 횟수 서버에 저장
   function savePtCount() {
     const memberId = /*[[${pageUserId}]]*/ 'default_id';
     fetch('/trainer/member/update-pt', {
@@ -182,12 +182,12 @@
     });
   }
 
-  // 4. 회원 삭제 기능 (에러 해결!)
+  // 회원 삭제 기능
   function deleteMember() {
     if (confirm("정말 이 회원을 담당 목록에서 삭제하시겠습니까?")) {
       const memberId = /*[[${pageUserId}]]*/ 'default_id';
       
-      // 💡 컨트롤러의 @PostMapping("/member/remove")와 파라미터명(memberId)에 정확히 맞췄습니다.
+      // 컨트롤러의 @PostMapping("/member/remove")와 파라미터명(memberId)으로 맞춤
       fetch('/trainer/member/remove?memberId=' + memberId, { 
         method: 'POST' 
       })

@@ -1,4 +1,4 @@
-package org.yourcompany.yourproject; // 💡 폴더 구조에 맞게 수정했습니다.
+package org.yourcompany.yourproject;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

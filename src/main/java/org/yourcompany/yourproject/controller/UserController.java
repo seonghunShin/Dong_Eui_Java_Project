@@ -23,17 +23,17 @@ public class UserController {
         return "loginForm"; // templates/login.html
     }
 
-    // 의사코드: 클래스 로그인(id, password) 구현부
+    // 역할군에 맞는 로그인
     @PostMapping("/user/login")
     public String login(@ModelAttribute LoginReqDto loginReqDto, HttpSession session) {
         try {
-            // UserService를 통해 로그인 검증 및 권한(Role) 획득
+            // UserService를 통해 로그인 검증 및 권한 획득
             LoginResDto loginRes = userService.login(loginReqDto);
 
-            // 로그인 성공 시 세션(Session)에 유저 정보 저장
+            // 로그인 성공 시 세션에 유저 정보 저장
             session.setAttribute("loginUser", loginRes);
 
-            // 의사코드 내부의 if(role == TRAINER / member) 분기 로직 구현
+            // 멤버 트레이너 구분
             if ("TRAINER".equals(loginRes.getRole())) {
                 return "redirect:/trainer/members"; // 트레이너 메인 라우팅
             } else {
@@ -52,7 +52,7 @@ public class UserController {
         return "redirect:/login-page"; 
     }
 
-    // 의사코드: 클래스[로그아웃] 구현부
+    // 로그아웃
     @GetMapping("/user/logout")
     public String logout(HttpSession session) {
         session.invalidate(); // 세션 무효화 (로그아웃)

@@ -2,7 +2,7 @@ package org.yourcompany.yourproject.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data; // 또는 lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddRecordReqDto {
-    private String mealType;  // 의사코드의 todayMealType 대응
-    private String mealTime;  // 의사코드의 todoMealTime 대응
+    private String mealType;  // todayMealType 대응
+    private String mealTime;  // todoMealTime 대응
     private String foodName;  
-    private int carbo;        // 의사코드의 todayCarbs 대응
-    private int protein;      // 의사코드의 todayprotein 대응
-    private int fat;          // 의사코드의 todayFat 대응
-    private int calories;     // 의사코드의 todayCalories 대응
+    private int carbo;        // todayCarbs 대응
+    private int protein;      // todayprotein 대응
+    private int fat;          // todayFat 대응
+    private int calories;     // todayCalories 대응
 }

@@ -26,22 +26,16 @@ public class Exercise {
     private LocalDate targetDate;     // 목표 날짜 (DATE 타입 매핑)
     private String targetExercise;    // 목표 운동 이름
     private int targetBurnedCal;      // 목표 소비 칼로리
-    private boolean todoGoal;         // 목표 달성 여부 (T/F)
+    private boolean todoGoal;         // 목표 달성 여부
 
-    /**
-     * 의사코드: 목표설정(목표설정Dto, pageId) 내 운동 가이드 수정 지원
-     */
+    // 목표 설정
     public void updateExerciseTargets(String exerciseName, int burnedCal) {
         this.targetExercise = exerciseName;
         this.targetBurnedCal = burnedCal;
-        // 목표가 새로 설정되거나 수정되면 달성 여부를 초기값(false)으로 세팅합니다.
         this.todoGoal = false; 
     }
 
-    /**
-     * 의사코드: 클레스[운동완료체크기능] (운동 테이블 todogool -> not 변경) 구현
-     * 비즈니스 로직: 회원이 체크박스를 누를 때 현재 상태를 반전(NOT 연산)시킵니다.
-     */
+    // 운동 완료 체크
     public void toggleGoalStatus() {
         this.todoGoal = !this.todoGoal; // true -> false, false -> true 반전
     }

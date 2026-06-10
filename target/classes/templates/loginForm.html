@@ -47,15 +47,15 @@
 </div>
 
 <script>
-  // [데이터베이스 초기화] 단일 유저 테이블 구조 반영
+  // 단일 유저 테이블 구조 반영
   let users = JSON.parse(localStorage.getItem('users'));
   if (!users) {
     users = [
-      // 1. 트레이너 계정 데이터
+      // 트레이너 계정 데이터
       { userId: "trainer", password: "1234", name: "김트레이너", role: "TRAINER" },
       { userId: "trainer02", password: "1234", name: "이코치", role: "TRAINER" },
       
-      // 2. 일반 회원 계정 데이터 (담당 트레이너 ID 및 잔여 PT 횟수 포함)
+      // 일반 회원 계정 데이터
       { userId: "user01", password: "1234", name: "서준영", role: "MEMBER", trainerId: "trainer", ptCount: 8 },
       { userId: "user02", password: "1234", name: "김지아", role: "MEMBER", trainerId: "trainer", ptCount: 15 },
       { userId: "user03", password: "1234", name: "박태형", role: "MEMBER", trainerId: "trainer02", ptCount: 0 }
@@ -70,14 +70,14 @@
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
 
-    // 1. 단일 유저 테이블에서 아이디로 유저 조회
+    // 단일 유저 테이블에서 아이디로 유저 조회
     const foundUser = users.find(u => u.userId === username);
 
     if (foundUser) {
-      // 2. 비밀번호 검증
+      // 비밀번호 검증
       if (foundUser.password === password) {
         
-        // 3. 권한(role)에 따른 분기 처리
+        // 권한에 따른 분기 처리
         if (foundUser.role === "TRAINER") {
           alert(`${foundUser.name} 강사님, 환영합니다!`);
           localStorage.setItem('activeTrainerId', foundUser.userId); // 로그인한 트레이너 정보 저장

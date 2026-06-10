@@ -29,22 +29,21 @@ public class TrainerController {
     private final TrainerService trainerService;
     private final UserRepository userRepository;
 
-    // 의사코드: 트레이너 메인 라우팅(userId)
+    // 트레이너 메인 라우팅
     @GetMapping("/members")
     public String memberList(HttpSession session, Model model) {
         // 세션에서 로그인된 트레이너 ID 추출
         LoginResDto loginUser = (LoginResDto) session.getAttribute("loginUser");
         if (loginUser == null || !"TRAINER".equals(loginUser.getRole())) return "redirect:/login";
 
-        // 의사코드: 클레스[트레이너 담당 리스트 불러오기] 기능 대응
+        // 트레이너 담당 리스트 조회
         List<TrainerMemberListResDto> chargeList = trainerService.getMemberList(loginUser.getUserId());
         model.addAttribute("chargeList", chargeList);
 
         return "trainer/list"; // templates/trainer/list.html (트레이너 메인창)
     }
 
-    // 의사코드: 클레스[회원 선택](pageUserId, chargeList.userId) -> 달력 화면 라우팅
-    // 🎯 트레이너가 특정 회원의 상세 페이지로 들어올 때 (수정)
+    // 회원 선택
     @GetMapping("/member/{memberId}")
     public String memberDetail(@PathVariable String memberId, 
                                @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -63,11 +62,11 @@ public class TrainerController {
         model.addAttribute("todoDay", todoDayMap);
         model.addAttribute("selectedDate", date);
 
-        // 🎯 [신규 추가] 식단 기록 및 목표 달성 여부 데이터
+        // 식단 기록 및 목표 달성 여부 데이터
         List<CalendarDetailRecordDto> mealDay = trainerService.getDailyDietDetails(memberId, date);
         Meal targetMeal = trainerService.getDailyMealTarget(memberId, date);
 
-        // 총 섭취량 자동 계산 (스트림 활용)
+        // 총 섭취량 자동 계산
         int totalKcal = mealDay.stream().mapToInt(m -> m.getCalories()).sum();
         int totalCarbs = mealDay.stream().mapToInt(m -> m.getCarbs()).sum();
         int totalProtein = mealDay.stream().mapToInt(m -> m.getProtein()).sum();
@@ -83,21 +82,21 @@ public class TrainerController {
         return "trainer/detail";
     }
 
-    // 의사코드: public void PT 횟수 변경(userId, newPTCount)
+    // PT 횟수 변경
     @PostMapping("/member/update-pt")
-    @ResponseBody // 비동기 처리가 가능하도록 지정
+    @ResponseBody
     public void updatePtCount(@RequestBody UpdatePtCountReqDto ptCountDto) {
         trainerService.updatePtCount(ptCountDto);
     }
 
-    // 의사코드: public void 목표설정(목표설정Dto, pageId)
+    // 목표 설정
     @PostMapping("/member/assign-target")
     public String assignTarget(@ModelAttribute TotalTargetAssignReqDto targetDto) {
         trainerService.assignTodayTarget(targetDto);
         return "redirect:/trainer/member/" + targetDto.getMemberId() + "?date=" + targetDto.getTargetDate();
     }
 
-    // 의사코드: public void 회원삭제(pageUserId, trainerId)
+    // 회원 삭제
     @PostMapping("/member/remove")
     @ResponseBody
     public String deleteMember(@RequestParam String memberId) {
@@ -108,7 +107,6 @@ public class TrainerController {
     @PostMapping("/member/add")
     public String addMemberToTrainer(@RequestParam String userId, HttpSession session) {
         LoginResDto loginUser = (LoginResDto) session.getAttribute("loginUser");
-        // 서비스에서 해당 userId의 회원 정보를 찾아 트레이너 ID를 update하는 로직 호출
         trainerService.assignMemberToTrainer(loginUser.getUserId(), userId); 
         return "redirect:/trainer/members";
     }

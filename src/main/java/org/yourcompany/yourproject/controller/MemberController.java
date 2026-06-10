@@ -36,7 +36,6 @@ public class MemberController {
     private final ExerciseRepository exerciseRepository;
     private final MealRepository mealRepository;
 
-    // 💡 생성자를 직접 작성하여 컴파일러에게 명확하게 알려줍니다.
     public MemberController(MemberService memberService, TrainerService trainerService,
                             ExerciseRepository exerciseRepository, MealRepository mealRepository) {
         this.memberService = memberService;
