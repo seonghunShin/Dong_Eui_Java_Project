@@ -1,5 +1,5 @@
 -- 1. 사용자 테이블 (user)
-CREATE TABLE `user` (
+CREATE TABLE `users` (
     `userId` VARCHAR(50) PRIMARY KEY COMMENT '사용자 아이디 (고유 식별자)',
     `password` VARCHAR(255) NOT NULL COMMENT '비밀번호',
     `name` VARCHAR(50) NOT NULL COMMENT '사용자 이름',
