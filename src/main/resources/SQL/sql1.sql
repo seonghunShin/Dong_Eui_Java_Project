@@ -1,4 +1,4 @@
--- 1. 사용자 테이블 (JPA 매핑에 의해 user_id가 PK)
+-- 1. 사용자 테이블
 CREATE TABLE `users` (
     `user_id` VARCHAR(255) PRIMARY KEY,
     `password` VARCHAR(255),
@@ -8,7 +8,7 @@ CREATE TABLE `users` (
     `pt_count` INT NOT NULL
 );
 
--- 2. 식단 과제 테이블 (member_user_id로 매핑됨)
+-- 2. 식단 과제 테이블
 CREATE TABLE `meal` (
     `assign_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
     `member_user_id` VARCHAR(255), 
