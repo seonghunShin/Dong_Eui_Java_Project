@@ -37,7 +37,7 @@
                 
                 <span class="dot" 
                       th:classappend="${todoDay.get(day).todoGoal == '성공' ? 'dot-ex-success' : 'dot-ex-pending'}"></span> 
-                
+
                 <span class="dot" 
                       th:classappend="${todoDay.get(day).recordDiet != '조회필요' ? 'dot-meal-success' : 'dot-meal-fail'}"></span>
                       
@@ -106,55 +106,30 @@
           </div>
         </article>
 
-        <script th:inline="javascript">
-          let ptCount = /*[[${ptCount}]]*/ 0; 
+        <article class="dashboard-card">
+          <div class="card-header" style="margin-bottom: 15px;">
+            <h3 th:text="${selectedDate} + ' 운동 기록'">운동 기록</h3>
+            
+            <th:block th:if="${todayExercise != null}">
+              <span class="status-badge success" th:if="${todayExercise.todoGoal}">미션 성공</span>
+              <span class="status-badge warning" th:if="${!todayExercise.todoGoal}">진행중</span>
+            </th:block>
+            <span class="status-badge" th:if="${todayExercise == null}">가이드 미설정</span>
+          </div>
 
-          // PT 횟수 +, - 조절 함수 (이하 기존 코드 동일)
-          function adjustPt(delta) {
-            currentPt += delta;
-            if (currentPt < 0) currentPt = 0; // 마이너스로 내려가지 않게 방지
-            document.getElementById('ptCountInput').innerText = currentPt;
-            document.getElementById('ptDisplay').innerText = "현재 " + currentPt + "회 남음";
-          }
+          <div style="background: var(--bg-primary); padding: 15px; border-radius: var(--radius-md); font-size: 0.9rem;" th:if="${todayExercise != null}">
+            <div style="margin-bottom: 8px; font-weight: bold; color: var(--text-main);">
+              🏃 수행 미션: <span style="color: var(--primary);" th:text="${todayExercise.targetExercise}">운동명</span>
+            </div>
+            <div style="font-size: 0.85rem; color: #64748b;">
+              🔥 목표 소모 칼로리: <b style="color: var(--text-main);" th:text="${todayExercise.targetBurnedCal}">0</b> kcal
+            </div>
+          </div>
 
-          // 변경된 PT 횟수 서버에 저장 (이하 기존 코드 동일)
-          function savePtCount() {
-            const memberId = /*[[${pageUserId}]]*/ 'default_id';
-            fetch('/trainer/member/update-pt', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ memberId: memberId, ptCount: currentPt })
-            }).then(res => {
-              if (res.ok) {
-                alert("PT 횟수가 성공적으로 업데이트되었습니다.");
-                location.reload();
-              } else {
-                alert("업데이트에 실패했습니다.");
-              }
-            });
-          }
-
-          function changePt(delta) {
-            ptCount += delta;
-            if(ptCount < 0) ptCount = 0;
-            document.getElementById('ptValue').innerText = ptCount;
-            document.getElementById('ptDisplay').innerText = "현재 " + ptCount + "회 남음";
-          }
-
-          function savePt() {
-            const memberId = "[[${pageUserId}]]";
-            fetch('/trainer/member/update-pt', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ memberId: memberId, ptCount: ptCount })
-            }).then(res => {
-              if(res.ok) {
-                alert("저장되었습니다.");
-                location.reload();
-              }
-            });
-          }
-        </script>
+          <p th:if="${todayExercise == null}" style="font-size: 0.85rem; color: #888; text-align: center; margin-top: 15px; padding: 10px;">
+            이날 배정된 운동 미션 가이드가 없습니다.
+          </p>
+        </article>
 
         <article class="dashboard-card">
           <div class="card-header">
@@ -187,18 +162,22 @@
 </div>
 
 <script th:inline="javascript">
-  // 초기 PT 횟수를 문자가 아닌 숫자로 안전하게 가져오기
-  let currentPt = parseInt(0, 10);
+  // 서버의 ptCount 값을 받아 초기화 진행
+  let currentPt = /*[[${ptCount}]]*/ 0;
 
-  // PT 횟수 +, - 조절 함수
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById('ptCountInput').innerText = currentPt;
+  });
+
+  // PT 횟수 조절
   function adjustPt(delta) {
     currentPt += delta;
-    if (currentPt < 0) currentPt = 0; // 마이너스로 내려가지 않게 방지
+    if (currentPt < 0) currentPt = 0;
     document.getElementById('ptCountInput').innerText = currentPt;
     document.getElementById('ptDisplay').innerText = "현재 " + currentPt + "회 남음";
   }
 
-  // 변경된 PT 횟수 서버에 저장
+  // PT 횟수 변경 사항 저장
   function savePtCount() {
     const memberId = /*[[${pageUserId}]]*/ 'default_id';
     fetch('/trainer/member/update-pt', {
@@ -215,12 +194,10 @@
     });
   }
 
-  // 회원 삭제 기능
+  // 담당 회원 삭제
   function deleteMember() {
     if (confirm("정말 이 회원을 담당 목록에서 삭제하시겠습니까?")) {
       const memberId = /*[[${pageUserId}]]*/ 'default_id';
-      
-      // 컨트롤러의 @PostMapping("/member/remove")와 파라미터명(memberId)으로 맞춤
       fetch('/trainer/member/remove?memberId=' + memberId, { 
         method: 'POST' 
       })

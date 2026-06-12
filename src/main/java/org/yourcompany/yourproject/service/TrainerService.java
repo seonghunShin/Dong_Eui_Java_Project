@@ -56,16 +56,29 @@ public class TrainerService {
         for (int day = 1; day <= lengthOfMonth; day++) {
             LocalDate targetDate = date.withDayOfMonth(day);
 
-            // 해당 날짜의 운동/식단 가이드 조회
+            // 해당 날짜의 운동 가이드 및 수행 여부 조회
             Exercise ex = exerciseRepository.findByMember_UserIdAndTargetDate(memberId, targetDate).orElse(null);
             
-            String goalStatus = (ex != null && ex.isTodoGoal()) ? "성공" : "진행중";
-            int burnedCal = (ex != null) ? ex.getTargetBurnedCal() : 0;
+            // Exercise 엔티티의 실제 부울 필드(todoGoal)의 완료 여부를 정확히 체크하여 매핑
+            String goalStatus = "진행중";
+            int burnedCal = 0;
+            if (ex != null) {
+                burnedCal = ex.getTargetBurnedCal();
+                if (ex.isTodoGoal()) {
+                    goalStatus = "성공";
+                }
+            }
+
+            // 해당 날짜에 회원이 실제로 기록한 식단 데이터 리스트 조회
+            List<Record> dayRecords = recordRepository.findByMember_UserIdAndRecordDate(memberId, targetDate);
+            
+            // 식단 기록이 존재하면 "기록있음", 없으면 "조회필요"로 가공하여 HTML 타임리프의 클래스 연동 조건 만족
+            String dietStatus = (dayRecords != null && !dayRecords.isEmpty()) ? "기록있음" : "조회필요";
 
             summaryMap.put(day, CalendarBriefInformationDto.builder()
                     .todoGoal(goalStatus)
                     .targetBurningCalories(burnedCal)
-                    .recordDiet("조회필요") // 식단Validator와 연동하여 달성/초과 텍스트 매핑 가능
+                    .recordDiet(dietStatus) 
                     .build());
         }
         return summaryMap;
@@ -141,6 +154,4 @@ public class TrainerService {
     public Meal getDailyMealTarget(String memberId, LocalDate date) {
         return mealRepository.findByMember_UserIdAndTargetDate(memberId, date).orElse(null);
     }
-
-    
 }

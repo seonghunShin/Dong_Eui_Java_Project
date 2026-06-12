@@ -2,6 +2,7 @@ package org.yourcompany.yourproject.controller;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +22,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.yourcompany.yourproject.repository.ExerciseRepository;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/trainer")
@@ -28,6 +31,7 @@ public class TrainerController {
 
     private final TrainerService trainerService;
     private final UserRepository userRepository;
+    private final ExerciseRepository exerciseRepository;
 
     // 트레이너 메인 라우팅
     @GetMapping("/members")
@@ -64,6 +68,9 @@ public class TrainerController {
         model.addAttribute("ptCount", member.getPtCount()); 
         model.addAttribute("todoDay", todoDayMap);
         model.addAttribute("selectedDate", date);
+
+        org.yourcompany.yourproject.entity.Exercise todayExercise = exerciseRepository.findByMember_UserIdAndTargetDate(memberId, date).orElse(null);
+        model.addAttribute("todayExercise", todayExercise);
 
         // 식단 기록 및 목표 달성 여부 데이터
         List<CalendarDetailRecordDto> mealDay = trainerService.getDailyDietDetails(memberId, date);
