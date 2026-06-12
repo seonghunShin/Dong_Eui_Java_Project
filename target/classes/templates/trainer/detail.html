@@ -107,7 +107,32 @@
         </article>
 
         <script th:inline="javascript">
-          let ptCount = "[[${ptCount}]]"; // 서버에서 가져온 초기값
+          let ptCount = /*[[${ptCount}]]*/ 0; 
+
+          // PT 횟수 +, - 조절 함수 (이하 기존 코드 동일)
+          function adjustPt(delta) {
+            currentPt += delta;
+            if (currentPt < 0) currentPt = 0; // 마이너스로 내려가지 않게 방지
+            document.getElementById('ptCountInput').innerText = currentPt;
+            document.getElementById('ptDisplay').innerText = "현재 " + currentPt + "회 남음";
+          }
+
+          // 변경된 PT 횟수 서버에 저장 (이하 기존 코드 동일)
+          function savePtCount() {
+            const memberId = /*[[${pageUserId}]]*/ 'default_id';
+            fetch('/trainer/member/update-pt', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ memberId: memberId, ptCount: currentPt })
+            }).then(res => {
+              if (res.ok) {
+                alert("PT 횟수가 성공적으로 업데이트되었습니다.");
+                location.reload();
+              } else {
+                alert("업데이트에 실패했습니다.");
+              }
+            });
+          }
 
           function changePt(delta) {
             ptCount += delta;
