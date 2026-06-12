@@ -19,13 +19,32 @@
   <main id="mainContent">
     <div class="calendar-layout">
       <div class="calendar-main-section dashboard-card">
-        <div class="calendar-header">
-          <h2><span th:text="${pageUserName != null ? pageUserName : pageUserId}">회원이름</span>님의 캘린더</h2>
+        
+        <div class="calendar-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h2 style="margin: 0;"><span th:text="${pageUserName != null ? pageUserName : pageUserId}">회원이름</span>님의 캘린더</h2>
+          
+          <nav class="calendar-nav" style="display: flex; align-items: center; gap: 15px; background: #f8fafc; padding: 6px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <a class="nav-arrow" 
+               th:href="@{|/trainer/member/${pageUserId}|(date=${selectedDate.minusMonths(1).withDayOfMonth(1)})}" 
+               style="text-decoration: none; font-size: 1.3rem; font-weight: bold; color: var(--primary); padding: 0 5px;">&lt;</a>
+            
+            <span id="calendarTitle" 
+                  th:text="${#temporals.format(selectedDate, 'yyyy년 MM월')}" 
+                  style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); min-width: 95px; text-align: center;">2026년 06월</span>
+            
+            <a class="nav-arrow" 
+               th:href="@{|/trainer/member/${pageUserId}|(date=${selectedDate.plusMonths(1).withDayOfMonth(1)})}" 
+               style="text-decoration: none; font-size: 1.3rem; font-weight: bold; color: var(--primary); padding: 0 5px;">&gt;</a>
+          </nav>
         </div>
+
         <div class="calendar-grid-header">
           <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
         </div>
           <div class="calendar-grid">
+            
+            <div class="calendar-cell empty" th:if="${startDayOfWeek > 0}" th:each="i : ${#numbers.sequence(1, startDayOfWeek)}"></div>
+
             <div class="calendar-cell" th:each="day : ${#numbers.sequence(1, daysInMonth)}" 
                   th:classappend="${day == selectedDate.dayOfMonth ? 'selected' : ''}"
                   th:data-url="@{|/trainer/member/${pageUserId}|(date=|${selectedDate.year}-${#numbers.formatInteger(selectedDate.monthValue, 2)}-${#numbers.formatInteger(day, 2)}|)}"
@@ -198,13 +217,13 @@
   function deleteMember() {
     if (confirm("정말 이 회원을 담당 목록에서 삭제하시겠습니까?")) {
       const memberId = /*[[${pageUserId}]]*/ 'default_id';
-      fetch('/trainer/member/remove?memberId=' + memberId, { 
-        method: 'POST' 
+      fetch('/trainer/member/remove?memberId=' + memberId, {
+        method: 'POST'
       })
-      .then(res => { 
+      .then(res => {
         if (res.ok) {
           alert("회원이 삭제되었습니다.");
-          location.href = '/trainer/members'; 
+          location.href = '/trainer/members';
         } else {
           alert("삭제에 실패했습니다.");
         }

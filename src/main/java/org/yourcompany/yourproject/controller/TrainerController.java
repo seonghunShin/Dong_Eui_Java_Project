@@ -58,7 +58,10 @@ public class TrainerController {
         
         if (date == null) date = LocalDate.now();
 
-        int daysInMonth = date.lengthOfMonth(); // 해당 월의 총 일수 계산 (예: 30 또는 31)
+        LocalDate firstDayOfMonth = date.withDayOfMonth(1); 
+        int startDayOfWeek = firstDayOfMonth.getDayOfWeek().getValue() % 7; // 시작 요일 구하기
+        int daysInMonth = date.lengthOfMonth(); // 해당 월의 총 일수
+        model.addAttribute("startDayOfWeek", startDayOfWeek);
         model.addAttribute("daysInMonth", daysInMonth);
 
         Map<Integer, CalendarBriefInformationDto> todoDayMap = trainerService.getCalendarSummary(memberId, date);
