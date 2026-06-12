@@ -26,13 +26,21 @@
           <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
         </div>
           <div class="calendar-grid">
-            <div class="calendar-cell" th:each="day : ${#numbers.sequence(1, 31)}" 
+            <div class="calendar-cell" th:each="day : ${#numbers.sequence(1, daysInMonth)}" 
+                  th:classappend="${day == selectedDate.dayOfMonth ? 'selected' : ''}"
                   th:data-url="@{|/trainer/member/${pageUserId}|(date=|${selectedDate.year}-${#numbers.formatInteger(selectedDate.monthValue, 2)}-${#numbers.formatInteger(day, 2)}|)}"
                   onclick="location.href=this.getAttribute('data-url')">
+              
               <div class="day-number" th:text="${day}">1</div>
+              
               <div class="cell-dots-container" th:if="${todoDay != null and todoDay.get(day) != null}">
-                <span class="dot dot-ex-success"></span> 
-                <span class="dot dot-meal-success"></span>
+                
+                <span class="dot" 
+                      th:classappend="${todoDay.get(day).todoGoal == '성공' ? 'dot-ex-success' : 'dot-ex-pending'}"></span> 
+                
+                <span class="dot" 
+                      th:classappend="${todoDay.get(day).recordDiet != '조회필요' ? 'dot-meal-success' : 'dot-meal-fail'}"></span>
+                      
               </div>
             </div>
           </div>
